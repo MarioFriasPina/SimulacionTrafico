@@ -1,8 +1,22 @@
 from mesa import Model, DataCollector
 from mesa.space import MultiGrid
-from mesa.time import RandomActivation 
+from mesa.time import RandomActivation
 
 from agent import RoombaAgent, TrashAgent, ObstacleAgent
+
+class RoombaResults():
+    def __init__(self, steps, percentage, moves, tiles):
+        self.steps = steps
+        self.percentage = percentage
+        self.moves = moves
+        self.tiles = tiles
+
+        self.percentageclean = 100 - percentage
+        self.average_moves = sum(moves)/ len(moves)
+        self.average_tiles = sum(tiles)/ len(tiles)
+
+    def __str__(self):
+        return "Steps taken: {}, Percentage Cleaned: {}%, Average Moves per agent: {}, Average Tiles Cleaned per agent: {}".format(self.steps, 100 - self.percentage, sum(self.moves)/ len(self.moves), sum(self.tiles)/ len(self.tiles))
 
 class RoombaModel(Model):
 
@@ -11,12 +25,20 @@ class RoombaModel(Model):
         self.schedule = RandomActivation(self)
         self.grid = MultiGrid(width, height, torus=False)
         self.max_time = max_time
+        self.numTrash = 0
+        self.steps = 0
 
         self.datacollector = DataCollector(
+            model_reporters=
             {
                 "TrashAgent": lambda m: self.count_type(m, "TrashAgent"),
                 "RoombaAgent": lambda m: self.count_type(m, "RoombaAgent"),
                 "OffRoombaAgent": lambda m: self.count_type(m, "OffRoombaAgent"),
+            },
+            agent_reporters=
+            {
+                "MovesRealized": lambda a: a.moved if isinstance(a, RoombaAgent) else 0,
+                "TilesCleaned": lambda a: a.cleanedTiles if isinstance(a, RoombaAgent) else 0
             }
         )
         #Add one roomba in (0,0) if roombas == 1
@@ -50,12 +72,14 @@ class RoombaModel(Model):
                 trash = TrashAgent((x, y), self, unique_id=(x + y * width))
                 self.grid.place_agent(trash, (x, y))
                 self.schedule.add(trash)
+                self.numTrash += 1
 
         self.running = True
         self.datacollector.collect(self)
 
     def step(self):
         self.schedule.step()
+        self.steps += 1
         self.datacollector.collect(self)
 
         #Halt if reached max time
@@ -65,10 +89,16 @@ class RoombaModel(Model):
         #Halt if no on agent
         if self.count_type(self, "RoombaAgent") == 0:
             self.running = False
-
+            
         #Halt if no trash left
         #if self.count_type(self, "TrashAgent") == 0:
         #    self.running = False
+
+        if self.running is False:
+            percentage = self.count_type(self, "TrashAgent") / self.numTrash * 100
+            return RoombaResults(self.steps, percentage, self.count_moves(self), self.count_cleans(self))
+        
+        return None
 
     # staticmethod is a Python decorator that makes a method callable without an instance.
     @staticmethod
@@ -81,3 +111,25 @@ class RoombaModel(Model):
             if agent.type == agent_type:
                 count += 1
         return count
+    
+    @staticmethod
+    def count_moves(model):
+        """
+        Helper method to count cells in a given condition in a given model.
+        """
+        list = []
+        for agent in model.schedule.agents:
+            if isinstance(agent, RoombaAgent):
+                list.append(agent.moved)
+        return list
+    
+    @staticmethod
+    def count_cleans(model):
+        """
+        Helper method to count cells in a given condition in a given model.
+        """
+        list = []
+        for agent in model.schedule.agents:
+            if isinstance(agent, RoombaAgent):
+                list.append(agent.cleanedTiles)
+        return list

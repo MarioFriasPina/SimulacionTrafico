@@ -138,12 +138,15 @@ class RoombaAgent(Agent):
         #Number of turns stuck
         self.stuck = 0
 
-        #Move once randomly if you are inactive and someone needs your charging station
-        self.move_from_home = False
-
         #Robots battery
         self.go_charge = False
         self.charge = 100
+
+            #Stats that may be important
+        #How many tiles this specific robot cleaned
+        self.cleanedTiles = 0
+        #How many tiles this specific robot moved
+        self.moved = 0
 
     def step(self):
         if self.type == "OffRoombaAgent":
@@ -164,17 +167,13 @@ class RoombaAgent(Agent):
                 self.go_charge = False
             return
 
-        #See obstacles that are up to 2 tiles awawy
-        for here in self.model.grid.iter_neighbors(self.pos, True, True, 2):
-            if here.type == 'ObstacleAgent' or here.type == 'OffRoombaAgent':
-                self.map[here.pos] = -1
-
         #Clean trash if inside
         for here in self.model.grid.iter_neighbors(self.pos, True, True, 0):
             if (here.type == 'TrashAgent'):
                 here._clean = True
                 self.model.grid.remove_agent(here)
                 do_action(self)
+                self.cleanedTiles += 1
                 return
 
         next_moves = []
@@ -194,7 +193,7 @@ class RoombaAgent(Agent):
             find_all_invalid(self.map, self.pos, create_dictionary(self.model.grid.width, self.model.grid.height), (self.model.grid.width, self.model.grid.height))
             #Find a path to original position
             self.path = astar_algo(self.map, (self.model.grid.width, self.model.grid.height), self.pos, self.original_pos)
-            self.journey = [self.pos]
+            self.go_charge = True
 
         #Go through known path
         if not self.path is None and len(self.path) > 1 and check_obstacles(self.model.grid, self.path[-2], self.map):
@@ -223,7 +222,7 @@ class RoombaAgent(Agent):
             self.path = None
             while self.path is None and not self.end:
                 if self.go_charge is True:
-                    self.far - self.original_pos
+                    self.far = self.original_pos
                 elif self.far == (-1, -1):
                     self.far = self.original_pos
                     self.end = True
@@ -239,16 +238,20 @@ class RoombaAgent(Agent):
                 map = merge_maps(self.map, here.map, self.model.grid.width, self.model.grid.height)
                 self.map = map
                 here.map = map
+            if here.type == 'ObstacleAgent' or here.type == 'OffRoombaAgent':
+                #See up to 2 tiles away
+                self.map[here.pos] = -1
 
         if self.next_pos is not None:
             self.model.grid.move_agent(self, self.next_pos)
             self.stuck = 0
             do_action(self)
             self.next_pos = None
+            self.moved += 1
         else:
             self.stuck += 1
-            #Got stuck
-            if (self.stuck > 3):
+            #Got stuck for 5 turns
+            if (self.stuck > 5):
                 next_moves = []
                 #Find empty position and move to it
                 for new_position in [(0, -1), (0, 1), (-1, 0), (1, 0)]:
@@ -256,9 +259,9 @@ class RoombaAgent(Agent):
                     if check_obstacles(self.model.grid, node_position, self.map):
                         next_moves.append(node_position)
                 self.model.grid.move_agent(self, self.random.choice(next_moves))
-                self.journey.append(self.pos)
                 self.stuck = 0
                 do_action(self)
+                self.moved += 1
                 self.next_pos = None
 
 class ObstacleAgent(Agent):

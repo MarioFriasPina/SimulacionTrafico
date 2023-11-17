@@ -1,4 +1,4 @@
-from mesa.visualization import CanvasGrid, ChartModule
+from mesa.visualization import CanvasGrid, ChartModule, BarChartModule
 from mesa.visualization import ModularServer
 from mesa.visualization import Slider
 
@@ -65,7 +65,6 @@ def heatmap(agent, x, y):
         portrayal["Color"] = calculate_color(agent.map[(x, y)])
     return portrayal
 
-
 # The chart will plot the number of dirty spots left
 trash_chart = ChartModule(
     [{"Label": "TrashAgent", "Color": "#00FF00"}]
@@ -76,7 +75,15 @@ roomba_chart = ChartModule(
     [{"Label": "RoombaAgent", "Color": "#0000FF"}, {"Label": "OffRoombaAgent", "Color": "#FF0000"}]
 )
 
-#
+#The chart that will plot the number of moves by agent
+moves = BarChartModule(
+    [{"Label":"MovesRealized", "Color":"#FF0000"}], 
+    scope="agent", sorting="ascending", sort_by="MovesRealized")
+
+#The chart that will plot the number of tiles cleaned by agent
+cleans = BarChartModule(
+    [{"Label":"TilesCleaned", "Color":"#0000FF"}], 
+    scope="agent", sorting="ascending", sort_by="TilesCleaned")
 
 height = 25
 width = 25
@@ -101,7 +108,7 @@ heatmap_canvas = MiCanvasGrid(heatmap, width, height, 500, 500)
 # elements to be displayed simultaneously, and for each of them to be updated
 # when the user interacts with them.
 server = ModularServer(
-    RoombaModel, [canvas_element, heatmap_canvas, trash_chart, roomba_chart], "Roomba", model_params
+    RoombaModel, [canvas_element, heatmap_canvas, trash_chart, roomba_chart, moves, cleans], "Roomba", model_params
 )
 
 server.launch()
