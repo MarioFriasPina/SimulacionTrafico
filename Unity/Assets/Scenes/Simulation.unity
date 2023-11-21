@@ -248,7 +248,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   layout: {fileID: 4900000, guid: 5c726c98170dabb4ca4fbfe12e2351d9, type: 3}
   roadPrefab: {fileID: 3240343348373693069, guid: 2fab344e70756a24fa9952e8fa370ff8, type: 3}
-  buildingPrefab: {fileID: 166658353019431037, guid: ada21eb7e52b140429622fa22e470e4d, type: 3}
+  buildingPrefab: {fileID: 2349445626509586150, guid: 49262808859d97b40abeada66bf86691, type: 3}
   semaphorePrefab: {fileID: 8989027769032698091, guid: e55d1c9bd4ba97946bc2c149ff2df778, type: 3}
   tileSize: 10
 --- !u!4 &754770272
