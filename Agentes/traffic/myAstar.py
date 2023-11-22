@@ -1,4 +1,5 @@
 import heapq
+import random
 
 class Node:
     def __init__(self, parent=None, position=None):
@@ -41,11 +42,23 @@ def astar_algo(maze, maze_size, start, end):
         for next_position in [(0, -1), (0, 1), (-1, 0), (1, 0)]:
             node_position = (current_node.position[0] + next_position[0], current_node.position[1] + next_position[1])
 
-            if (
-                node_position[0] < 0 or node_position[0] >= maze_size[0] or
-                node_position[1] < 0 or node_position[1] >= maze_size[1] or
-                maze[node_position] < 0
-            ):
+            if (node_position[0] < 0 or node_position[0] >= maze_size[0] or node_position[1] < 0 or node_position[1] >= maze_size[1]):
+                continue
+
+            #Movement Logic
+            #Obstacle
+            if (maze[node_position] == '#'):
+                continue
+
+            
+            #Dont go against direction of traffic
+            if (maze[node_position] == 'v' and next_position[0] == 0 and next_position[1] == 1):
+                continue
+            if (maze[node_position] == '^' and next_position[0] == 0 and next_position[1] == -1):
+                continue
+            if (maze[node_position] == '>' and next_position[0] == -1 and next_position[1] == 0):
+                continue
+            if (maze[node_position] == '<' and next_position[0] == 1 and next_position[1] == 0):
                 continue
 
             new_node = Node(current_node, node_position)
@@ -53,7 +66,7 @@ def astar_algo(maze, maze_size, start, end):
                 continue
 
             new_node.g = current_node.g + 1
-            # Use a simpler heuristic (Manhattan distance) for relaxation
+            # Use Manhattan distance for no diagonal movement
             new_node.h = abs(new_node.position[0] - goal_node.position[0]) + abs(new_node.position[1] - goal_node.position[1])
             new_node.f = new_node.g + new_node.h
 
