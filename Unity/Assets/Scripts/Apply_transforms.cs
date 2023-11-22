@@ -35,7 +35,7 @@ public class Apply_transforms : MonoBehaviour
 
         //Instantiate the wheels
         for(int i = 0; i<wheel.Length; i++){
-            GameObject temp = Instantiate(wheelModel, new Vector3(0,0,0), Quaternion.identity);
+            GameObject temp = Instantiate(wheelModel, this.transform.position, Quaternion.identity);
 
             //Obtain the mesh and vertices of the wheel
             wheel[i].mesh = temp.GetComponentInChildren<MeshFilter>().mesh;
