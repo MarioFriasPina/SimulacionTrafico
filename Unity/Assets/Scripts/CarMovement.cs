@@ -35,8 +35,9 @@ public class CarMovement : MonoBehaviour
         {
             //Create wheels
             GameObject wheel_copy;
-            wheel_copy = Instantiate(Wheel, new Vector3(0,0,0), Quaternion.identity);
+            wheel_copy = Instantiate(Wheel, this.transform.position, Quaternion.identity);
             wheel_copy.transform.SetParent(this.transform);
+
 
             wheels_mesh[i] = wheel_copy.GetComponentInChildren<MeshFilter>().mesh;
 
@@ -64,7 +65,7 @@ public class CarMovement : MonoBehaviour
     void DoTransform()
     {
         Matrix4x4 move = HW_Transforms.TranslationMat(direction.x * Time.time, direction.y * Time.time, direction.z * Time.time);
-        Matrix4x4 wheelrotate = HW_Transforms.RotateMat(120 * Time.time, AXIS.Z);
+        Matrix4x4 wheelrotate = HW_Transforms.RotateMat(120 * Time.time, AXIS.X);
         Matrix4x4 rotate = HW_Transforms.RotateMat(angle, AXIS.Y);
 
         Matrix4x4 composite = move * rotate;
