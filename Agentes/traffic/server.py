@@ -62,13 +62,14 @@ def agent_portrayal(agent):
 
 width = 0
 height = 0
+file = 'city_files/city2021.txt'
 
-with open('city_files/city2021.txt') as baseFile:
+with open(file) as baseFile:
     lines = baseFile.readlines()
     width = len(lines[0])-1
     height = len(lines)
 
-model_params = {"N":5}
+model_params = {"file" : file, "N":4}
 
 #print(width, height)
 grid = CanvasGrid(agent_portrayal, width, height, 500, 500)

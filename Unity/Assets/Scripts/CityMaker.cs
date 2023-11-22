@@ -36,40 +36,50 @@ public class CityMaker : MonoBehaviour
         GameObject tile;
 
         for (int i=0; i<tiles.Length; i++) {
-            if (tiles[i] == '>' || tiles[i] == '<') {
+            if (tiles[i] == '>') {
                 position = new Vector3(x * tileSize, 0, y * tileSize);
-                tile = Instantiate(roadPrefab, position, Quaternion.identity);
+                tile = Instantiate(roadPrefab, position, Quaternion.Euler(0, 270, 0));
                 tile.transform.parent = transform;
-                x += 1;
-            } else if (tiles[i] == 'v' || tiles[i] == '^') {
+                x += 1;            
+            } else if (tiles[i] == '<') {
                 position = new Vector3(x * tileSize, 0, y * tileSize);
                 tile = Instantiate(roadPrefab, position, Quaternion.Euler(0, 90, 0));
+                tile.transform.parent = transform;
+                x += 1;
+            } else if (tiles[i] == 'v') {
+                position = new Vector3(x * tileSize, 0, y * tileSize);
+                tile = Instantiate(roadPrefab, position, Quaternion.Euler(0, 0, 0));
+                tile.transform.parent = transform;
+                x += 1;
+            } else if (tiles[i] == '^') {
+                position = new Vector3(x * tileSize, 0, y * tileSize);
+                tile = Instantiate(roadPrefab, position, Quaternion.Euler(0, 180, 0));
                 tile.transform.parent = transform;
                 x += 1;
             } else if (tiles[i] == 's') {
                 position = new Vector3(x * tileSize, 0, y * tileSize);
                 tile = Instantiate(roadPrefab, position, Quaternion.identity);
                 tile.transform.parent = transform;
-                tile = Instantiate(semaphorePrefab, position, Quaternion.identity);
-                tile.transform.parent = transform;
+                //tile = Instantiate(semaphorePrefab, position, Quaternion.identity);
+                //tile.transform.parent = transform;
                 x += 1;
             } else if (tiles[i] == 'S') {
                 position = new Vector3(x * tileSize, 0, y * tileSize);
                 tile = Instantiate(roadPrefab, position, Quaternion.Euler(0, 90, 0));
                 tile.transform.parent = transform;
-                tile = Instantiate(semaphorePrefab, position, Quaternion.Euler(0, 90, 0));
-                tile.transform.parent = transform;
+                //tile = Instantiate(semaphorePrefab, position, Quaternion.Euler(0, 90, 0));
+                //tile.transform.parent = transform;
                 x += 1;
             } else if (tiles[i] == 'D') {
                 position = new Vector3(x * tileSize, 0, y * tileSize);
                 tile = Instantiate(buildingPrefab, position, Quaternion.Euler(0, 90, 0));
-                tile.GetComponent<Renderer>().materials[0].color = Color.red;
+                //tile.GetComponent<Renderer>().materials[0].color = Color.red;
                 tile.transform.parent = transform;
                 x += 1;
             } else if (tiles[i] == '#') {
                 position = new Vector3(x * tileSize, 0, y * tileSize);
                 tile = Instantiate(buildingPrefab, position, Quaternion.identity);
-                tile.transform.localScale = new Vector3(1, Random.Range(0.5f, 2.0f), 1);
+                tile.transform.localScale = new Vector3(1f, Random.Range(0.1f, 0.5f), 1f);
                 tile.transform.parent = transform;
                 x += 1;
             } else if (tiles[i] == '\n') {

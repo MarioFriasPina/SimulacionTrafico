@@ -1,5 +1,5 @@
 from mesa import Agent
-from myAstar import astar_algo
+from .myAstar import astar_algo
 
 class Car(Agent):
     """
@@ -16,12 +16,12 @@ class Car(Agent):
         self.path = astar_algo(self.map, (self.model.grid.width, self.model.grid.height), self.pos, self.dest)
         self.last_pos = None
 
-        #If crash then 
-        for next_pos in self.model.grid.iter_neighbors(self.path[-2], True, True, 0):
+        #If crash then stop
+        for next_pos in self.model.grid.iter_neighbors(self.pos, True, True, 0):
             if isinstance(next_pos, Car) and not next_pos == self:
                 self.model.crash = self.pos
 
-    def move(self, move=False):
+    def move(self):
         """ 
         Determines if the agent can move in the direction that was chosen
         """

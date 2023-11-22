@@ -227,6 +227,7 @@ GameObject:
   m_Component:
   - component: {fileID: 754770272}
   - component: {fileID: 754770271}
+  - component: {fileID: 754770273}
   m_Layer: 0
   m_Name: CityController
   m_TagString: Untagged
@@ -246,10 +247,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 883950aa76e0aa44bb80314dab0fd599, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  layout: {fileID: 4900000, guid: 5c726c98170dabb4ca4fbfe12e2351d9, type: 3}
-  roadPrefab: {fileID: 3240343348373693069, guid: 2fab344e70756a24fa9952e8fa370ff8, type: 3}
-  buildingPrefab: {fileID: 2349445626509586150, guid: 49262808859d97b40abeada66bf86691, type: 3}
-  semaphorePrefab: {fileID: 8989027769032698091, guid: e55d1c9bd4ba97946bc2c149ff2df778, type: 3}
+  layout: {fileID: 4900000, guid: c4ee8e330bf578f4cb48bf4510494772, type: 3}
+  roadPrefab: {fileID: 8521628870070417363, guid: cb77fb80d99ffc349bf608946e2fdffb, type: 3}
+  buildingPrefab: {fileID: 8420228362700203759, guid: 3a6d6a9a5bf27a54ca7db3c5801bbeb1, type: 3}
+  semaphorePrefab: {fileID: 2716058349196289285, guid: 01c471facf2bee54fb7ebc7f5748a53f, type: 3}
   tileSize: 10
 --- !u!4 &754770272
 Transform:
@@ -266,6 +267,23 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &754770273
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 754770270}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23891d7a0c440da46a557f9f30183961, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  agentPrefab: {fileID: 7875739886752982414, guid: 3bce3f0e45944f24aa948ae807efcf34, type: 3}
+  obstaclePrefab: {fileID: 2716058349196289285, guid: 01c471facf2bee54fb7ebc7f5748a53f, type: 3}
+  file: C:/Users/mario/source/Simulation/Agentes/traffic/city_files/city2021.txt
+  timeToUpdate: 5
+  tileSize: 10
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0
@@ -352,7 +370,7 @@ Transform:
   m_GameObject: {fileID: 963194225}
   serializedVersion: 2
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 300, z: 0}
+  m_LocalPosition: {x: 100, y: 600, z: 100}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

@@ -1,7 +1,7 @@
 from mesa import Model
 from mesa.time import RandomActivation
 from mesa.space import MultiGrid
-from agent import *
+from .agent import *
 import json
 
 class CityModel(Model):
@@ -9,19 +9,20 @@ class CityModel(Model):
         Creates a model based on a city map.
 
         Args:
+            file: File for the city map
             N: Number of steps before new arrivals
             max: Number of steps before stopping simulation
     """
 
-    def __init__(self, N = 4, max = 10000):
+    def __init__(self, file, N = 4, max = 10000):
 
         # Load the map dictionary. The dictionary maps the characters in the map file to the corresponding agent.
-        dataDictionary = json.load(open("city_files/mapDictionary.json"))
+        dataDictionary = json.load(open("C:/Users/mario/source/Simulation/Agentes/traffic/city_files/mapDictionary.json"))
 
         self.traffic_lights = []
 
         # Load the map file. The map file is a text file where each character represents an agent.
-        with open('city_files/city2021.txt') as baseFile:
+        with open(file) as baseFile:
             lines = baseFile.readlines()
             self.width = len(lines[0])-1
             self.height = len(lines)
@@ -62,13 +63,24 @@ class CityModel(Model):
         self.max = max
         self.running = True
         self.map.change_lights()
-        #car = Car(f"car_{1}", self, (0, 0), self.map)
-        #self.grid.place_agent(car, (0, 0))
-        #self.schedule.add(car)
+
+        #Data Collection
+        self.staticagents = len(self.schedule.agents)
+        self.maxagents = 0
 
     def step(self):
         '''Advance the model by one step.'''
         self.steps += 1
+
+        if self.steps % self.numSteps == 1:
+            self.add_cars()
+
+        self.agents = len(self.schedule.agents) - self.staticagents
+
+        if (self.agents > self.maxagents):
+            self.maxagents = self.agents
+
+        print(f"Number of agents: {self.agents}. Max agents: {self.maxagents}")
 
         if self.crash:
             self.running = False
@@ -80,8 +92,6 @@ class CityModel(Model):
             return 1
 
         self.schedule.step()
-        if self.steps % self.numSteps == 1:
-            self.add_cars()
 
 
     def add_cars(self):
