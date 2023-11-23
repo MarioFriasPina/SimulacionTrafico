@@ -217,19 +217,24 @@ public class AgentController : MonoBehaviour
                 {
                     prevPositions[agent.id] = newAgentPosition;
                     agents[agent.id] = Instantiate(agentPrefab, newAgentPosition, Quaternion.identity);
+                    Apply_transforms apply_transforms = agents[agent.id].GetComponent<Apply_transforms>(); //Get the script
+                    apply_transforms.SetDestination(newAgentPosition); //Set the destination
+                    //set time
+                    apply_transforms.move_time = timeToUpdate;
                 }
                 else
                 {
-                    Vector3 currentPosition = new Vector3();
-                    if(currPositions.TryGetValue(agent.id, out currentPosition))
-                        prevPositions[agent.id] = currentPosition;
-                    currPositions[agent.id] = newAgentPosition;
+                    Apply_transforms apply_transforms = agents[agent.id].GetComponent<Apply_transforms>(); //Get the script
+                    apply_transforms.SetDestination(newAgentPosition); //Set the destination
                 }
             }
 
             updated = true;
         }
+
     }
+
+
 
     IEnumerator GetObstacleData() 
     {
