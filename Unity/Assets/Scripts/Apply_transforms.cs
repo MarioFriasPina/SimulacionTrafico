@@ -21,6 +21,12 @@ public class Apply_transforms : MonoBehaviour
 
     [SerializeField] Wheel[] wheel;
 
+    public Vector3 initial_pos;
+    public Vector3 final_pos;
+    public float ti = 0;
+    public float elapsed_time = 0;
+    public float move_time = 0;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -62,22 +68,36 @@ public class Apply_transforms : MonoBehaviour
     void Update()
     {
         DoTransform();
+
+    }
+
+    public void SetDestination(Vector3 destination){
+        initial_pos = final_pos;
+        final_pos = destination;
+        elapsed_time = 0;
     }
 
     void DoTransform(){
         //Set the initial position of the wheels
         //Set the angle of the car using the displacement vector
+        ti = elapsed_time / move_time; //Calculate the interpolation time
+        displacement = Vector3.Lerp(initial_pos, final_pos, ti); //Calculate the displacement
+        elapsed_time += Time.deltaTime; //Update the elapsed time
+        
+
         angle = GetAngle(displacement);
-        Matrix4x4 move = HW_Transforms.TranslationMat(displacement.x *Time.time,
-                                                      displacement.y *Time.time,
-                                                      displacement.z *Time.time);
+        Matrix4x4 move = HW_Transforms.TranslationMat(displacement.x,
+                                                      displacement.y,
+                                                      displacement.z);
+        
+        //Print the displacement varia
+        Debug.Log("Displacement: " + displacement);
 
         Matrix4x4 rotate = HW_Transforms.RotateMat(angle, rotationAXIS);
         Matrix4x4 composite = move * rotate;
 
         Matrix4x4 rotate_wheel1 = HW_Transforms.RotateMat(wheel[0].rotation * Time.time, AXIS.X);
-        //Print the matrix
-        Debug.Log(rotate_wheel1);
+
 
         //Apply the composite for the car
         for(int i = 0; i<vertices.Length; i++){

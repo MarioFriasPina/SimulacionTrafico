@@ -17,7 +17,7 @@ class CityModel(Model):
     def __init__(self, file, N = 4, max = 10000):
 
         # Load the map dictionary. The dictionary maps the characters in the map file to the corresponding agent.
-        dataDictionary = json.load(open("C:/Users/mario/source/Simulation/Agentes/traffic/city_files/mapDictionary.json"))
+        dataDictionary = json.load(open("C:/Users/shaul/OneDrive/Desktop/Tec5/agentes/SimulacionTrafico/Agentes/traffic/city_files/mapDictionary.json"))
 
         self.traffic_lights = []
 
