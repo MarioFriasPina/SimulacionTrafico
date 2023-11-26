@@ -1,5 +1,8 @@
 from mesa import Agent
-from .myAstar import astar_algo
+try:
+    from .myAstar import astar_algo
+except:
+    from myAstar import astar_algo
 
 class Car(Agent):
     """
@@ -17,18 +20,38 @@ class Car(Agent):
         self.last_pos = None
 
         #If crash then stop
-        for next_pos in self.model.grid.iter_neighbors(self.pos, True, True, 0):
-            if isinstance(next_pos, Car) and not next_pos == self:
-                self.model.crash = self.pos
+        #for next_pos in self.model.grid.iter_neighbors(self.pos, True, True, 0):
+        #    if isinstance(next_pos, Car) and not next_pos == self:
+        #        self.model.crash = self.pos
 
     def move(self):
         """ 
         Determines if the agent can move in the direction that was chosen
         """
-        if len(self.path) > 1:
+
+        if not self.path is None and len(self.path) > 1:
+            #Dont move into a position where you will find another car
+            for next_pos in self.model.grid.iter_neighbors(self.path[-2], True, True, 0):
+                if isinstance(next_pos, Car):
+                    return
+
             self.path.pop()
             self.last_pos = self.pos
             self.model.grid.move_agent(self, self.path[-1])
+        else:
+            self.path = astar_algo(self.map, (self.model.grid.width, self.model.grid.height), self.pos, self.dest)
+
+    def change_lane(self, pos):
+        """
+        Determines if the agent can move to a new lane to create more space
+        """
+        direction = self.map[pos]
+        #last_pos = self.map[self.last_pos]
+        self.map[pos] = '#'
+        #self.map[self.last_pos] = '#'
+        self.path = astar_algo(self.map, (self.model.grid.width, self.model.grid.height), self.pos, self.dest)
+        self.map[pos] = direction
+        #self.map[self.last_pos] = last_pos
 
     def step(self):
         """ 
@@ -44,10 +67,12 @@ class Car(Agent):
         for here in self.model.grid.iter_neighbors(self.pos, True, True, 0):
             if isinstance(here, Traffic_Light) and not here.state:
                 return
-        
+
         #Dont move into a position where you will find another car
         for next_pos in self.model.grid.iter_neighbors(self.path[-2], True, True, 0):
             if isinstance(next_pos, Car):
+                self.change_lane(next_pos.pos)
+                self.move()
                 return
 
         self.move()
@@ -68,6 +93,9 @@ class Traffic_Light(Agent):
         """
         self.state = state
         self.timeToChange = timeToChange
+
+        #Direction that the light is pointing towards
+        self.direction = None
 
     def step(self):
         """ 
@@ -119,9 +147,11 @@ class Map():
     Creates a map filled with the information of the map
     
     Args:
+        grid: Grid with other agents
         w, h: Size of the map 
     """
-    def __init__(self, w, h):
+    def __init__(self, grid, w, h):
+        self.grid = grid
         self.map = self.create_map(w, h)
         self.listDest = []
     
@@ -147,11 +177,14 @@ class Map():
                 if (pos[0] + 1, pos[1]) in keys and self.map[(pos[0] + 1, pos[1])] == '<':
                     self.map[pos] = '<'
                 #Right
-                if (pos[0] - 1, pos[1]) in keys and self.map[(pos[0] - 1, pos[1])] == '>':
+                elif (pos[0] - 1, pos[1]) in keys and self.map[(pos[0] - 1, pos[1])] == '>':
                     self.map[pos] = '>'
                 #Up
-                if (pos[0], pos[1] + 1) in keys and self.map[(pos[0], pos[1] + 1)] == 'v':
+                elif (pos[0], pos[1] + 1) in keys and self.map[(pos[0], pos[1] + 1)] == 'v':
                     self.map[pos] = 'v'
                 #Down
-                if (pos[0], pos[1] - 1) in keys and self.map[(pos[0], pos[1] - 1)] == '^':
+                elif (pos[0], pos[1] - 1) in keys and self.map[(pos[0], pos[1] - 1)] == '^':
                     self.map[pos] = '^'
+                for light in self.grid.iter_neighbors(pos, True, True, 0):
+                    if isinstance(light, Traffic_Light):
+                        light.direction = self.map[pos]

@@ -50,7 +50,16 @@ def astar_algo(maze, maze_size, start, end):
             if (maze[node_position] == '#'):
                 continue
 
-            
+            #Dont go to the corners of the grid
+            if node_position[0] == 0 and node_position[1] == 0:
+                continue
+            if node_position[0] == maze_size[0] and node_position[1] == 0:
+                continue
+            if node_position[0] == 0 and node_position[1] == maze_size[1]:
+                continue
+            if node_position[0] == maze_size[0] and node_position[1] == maze_size[1]:
+                continue
+
             #Dont go against direction of traffic
             if (maze[node_position] == 'v' and next_position[0] == 0 and next_position[1] == 1):
                 continue

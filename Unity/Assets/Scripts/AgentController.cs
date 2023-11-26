@@ -20,16 +20,18 @@ public class AgentData
         x (float): The x coordinate of the agent.
         y (float): The y coordinate of the agent.
         z (float): The z coordinate of the agent.
+        state (string): The state of the agent. (Applicable only to obstacle type agents)
     */
-    public string id;
+    public string id, state;
     public float x, y, z;
 
-    public AgentData(string id, float x, float y, float z)
+    public AgentData(string id, float x, float y, float z, string state)
     {
         this.id = id;
         this.x = x;
         this.y = y;
         this.z = z;
+        this.state = state;
     }
 }
 
@@ -82,7 +84,7 @@ public class AgentController : MonoBehaviour
     string sendConfigEndpoint = "/init";
     string updateEndpoint = "/update";
     AgentsData agentsData, obstacleData;
-    Dictionary<string, GameObject> agents;
+    Dictionary<string, GameObject> agents, lights;
     Dictionary<string, Vector3> prevPositions, currPositions;
 
     bool updated = false;
@@ -104,6 +106,7 @@ public class AgentController : MonoBehaviour
         currPositions = new Dictionary<string, Vector3>();
 
         agents = new Dictionary<string, GameObject>();
+        lights = new Dictionary<string, GameObject>();
 
         //floor.transform.localScale = new Vector3((float)width/10, 1, (float)height/10);
         //floor.transform.localPosition = new Vector3((float)width/2-0.5f, 0, (float)height/2-0.5f);
@@ -157,6 +160,7 @@ public class AgentController : MonoBehaviour
         else 
         {
             StartCoroutine(GetAgentsData());
+            StartCoroutine(GetObstacleData());
         }
     }
 
@@ -169,9 +173,6 @@ public class AgentController : MonoBehaviour
         */
         WWWForm form = new WWWForm();
 
-        //form.AddField("NAgents", NAgents.ToString());
-        //form.AddField("width", width.ToString());
-        //form.AddField("height", height.ToString());
         form.AddField("file", file);
 
         UnityWebRequest www = UnityWebRequest.Post(serverUrl + sendConfigEndpoint, form);
@@ -217,6 +218,8 @@ public class AgentController : MonoBehaviour
                 {
                     prevPositions[agent.id] = newAgentPosition;
                     agents[agent.id] = Instantiate(agentPrefab, newAgentPosition, Quaternion.identity);
+                    agents[agent.id].name = agent.id;
+
                     Apply_transforms apply_transforms = agents[agent.id].GetComponent<Apply_transforms>(); //Get the script
                     apply_transforms.SetDestination(newAgentPosition); //Set the destination
                     //set time
@@ -228,13 +231,9 @@ public class AgentController : MonoBehaviour
                     apply_transforms.SetDestination(newAgentPosition); //Set the destination
                 }
             }
-
             updated = true;
         }
-
     }
-
-
 
     IEnumerator GetObstacleData() 
     {
@@ -251,8 +250,36 @@ public class AgentController : MonoBehaviour
 
             foreach(AgentData obstacle in obstacleData.positions)
             {
-                Quaternion rotation = Quaternion.Euler(0, 90, 0);
-                Instantiate(obstaclePrefab, new Vector3(obstacle.x * tileSize, obstacle.y, (obstacle.z - 1) * tileSize), rotation);
+                if (!lights.ContainsKey(obstacle.id)){
+                    Quaternion rotation;
+
+                    if (obstacle.id[0] == '<') {
+                        rotation = Quaternion.Euler(0, 90, 0);
+                        lights[obstacle.id] = Instantiate(obstaclePrefab, new Vector3((obstacle.x - 0.5f) * tileSize, obstacle.y, (obstacle.z - 1.5f) * tileSize), rotation);
+                    }
+                    else if (obstacle.id[0] == '>') {
+                        rotation = Quaternion.Euler(0, 270, 0);
+                        lights[obstacle.id] = Instantiate(obstaclePrefab, new Vector3((obstacle.x + 0.5f) * tileSize, obstacle.y, (obstacle.z - 0.5f) * tileSize), rotation);
+                    }
+                    else if (obstacle.id[0] == 'v') {
+                        rotation = Quaternion.Euler(0, 0, 0);
+                        lights[obstacle.id] = Instantiate(obstaclePrefab, new Vector3((obstacle.x + 0.5f) * tileSize, obstacle.y, (obstacle.z - 1.5f) * tileSize), rotation);
+                    }
+                    else if (obstacle.id[0] == '^') {
+                        rotation = Quaternion.Euler(0, 180, 0);
+                        lights[obstacle.id] = Instantiate(obstaclePrefab, new Vector3((obstacle.x - 0.5f) * tileSize, obstacle.y, (obstacle.z - 0.5f) * tileSize), rotation);
+                    }
+                    lights[obstacle.id].name = obstacle.id;
+                }
+                else
+                {
+                    foreach(var light in lights[obstacle.id].GetComponentsInChildren<Light>(true)){
+                        if (obstacle.state == "True")
+                            light.color = Color.green;
+                        else
+                            light.color = Color.red;
+                    }
+                }
             }
         }
     }

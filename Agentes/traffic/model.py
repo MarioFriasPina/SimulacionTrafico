@@ -1,8 +1,12 @@
 from mesa import Model
 from mesa.time import RandomActivation
 from mesa.space import MultiGrid
-from .agent import *
 import json
+
+try:
+    from .agent import *
+except:
+    from agent import *
 
 class CityModel(Model):
     """ 
@@ -17,7 +21,10 @@ class CityModel(Model):
     def __init__(self, file, N = 4, max = 10000):
 
         # Load the map dictionary. The dictionary maps the characters in the map file to the corresponding agent.
-        dataDictionary = json.load(open("C:/Users/shaul/OneDrive/Desktop/Tec5/agentes/SimulacionTrafico/Agentes/traffic/city_files/mapDictionary.json"))
+        try:
+            dataDictionary = json.load(open("static/city_files/mapDictionary.json"))
+        except:
+            dataDictionary = json.load(open("traffic/static/city_files/mapDictionary.json"))
 
         self.traffic_lights = []
 
@@ -30,7 +37,7 @@ class CityModel(Model):
             self.grid = MultiGrid(self.width, self.height, torus = False) 
             self.schedule = RandomActivation(self)
 
-            self.map = Map(self.width, self.height)
+            self.map = Map(self.grid, self.width, self.height)
             self.steps = 0
             self.crash = False
 
@@ -72,9 +79,6 @@ class CityModel(Model):
         '''Advance the model by one step.'''
         self.steps += 1
 
-        if self.steps % self.numSteps == 1:
-            self.add_cars()
-
         self.agents = len(self.schedule.agents) - self.staticagents
 
         if (self.agents > self.maxagents):
@@ -82,6 +86,7 @@ class CityModel(Model):
 
         print(f"Number of agents: {self.agents}. Max agents: {self.maxagents}")
 
+        self.crash = self.find_crashes()
         if self.crash:
             self.running = False
             print(f"Two cars crashed in step {self.steps} at position {self.crash}")
@@ -93,6 +98,19 @@ class CityModel(Model):
 
         self.schedule.step()
 
+        if self.steps % self.numSteps == 1:
+            self.add_cars()
+
+
+    def find_crashes(self):
+        """
+        Find if there are any crashes in the board
+        """
+        keys = [(x, y) for x in range(self.grid.width) for y in range(self.grid.height)]
+        for key in keys:
+            if len(self.grid.get_neighbors(key, True, True, 0)) > 2:
+                return key
+        return False
 
     def add_cars(self):
         """

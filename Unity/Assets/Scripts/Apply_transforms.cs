@@ -91,7 +91,7 @@ public class Apply_transforms : MonoBehaviour
                                                       displacement.z);
         
         //Print the displacement varia
-        Debug.Log("Displacement: " + displacement);
+        //Debug.Log("Displacement: " + displacement);
 
         Matrix4x4 rotate = HW_Transforms.RotateMat(angle, rotationAXIS);
         Matrix4x4 composite = move * rotate;
