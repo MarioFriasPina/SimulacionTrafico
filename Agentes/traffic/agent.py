@@ -18,11 +18,7 @@ class Car(Agent):
         self.dest = self.random.choice(map.listDest)
         self.path = astar_algo(self.map, (self.model.grid.width, self.model.grid.height), self.pos, self.dest)
         self.last_pos = None
-
-        #If crash then stop
-        #for next_pos in self.model.grid.iter_neighbors(self.pos, True, True, 0):
-        #    if isinstance(next_pos, Car) and not next_pos == self:
-        #        self.model.crash = self.pos
+        self.state = "Alive"
 
     def move(self):
         """ 
@@ -57,10 +53,16 @@ class Car(Agent):
         """ 
         Determines the new direction it will take, and then moves
         """
-        #Kill self if reached destination
-        if (self.pos == self.dest):
+        if (self.state == "Dead"):
             self.model.grid.remove_agent(self)
             self.model.schedule.remove(self)
+            return
+
+        #Kill self if reached destination
+        if (self.pos == self.dest):
+            self.state = "Dead"
+            #self.model.grid.remove_agent(self)
+            #self.model.schedule.remove(self)
             return
 
         #Dont move if in red light

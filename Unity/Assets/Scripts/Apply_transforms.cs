@@ -41,7 +41,7 @@ public class Apply_transforms : MonoBehaviour
 
         //Instantiate the wheels
         for(int i = 0; i<wheel.Length; i++){
-            GameObject temp = Instantiate(wheelModel, this.transform.position, Quaternion.identity);
+            GameObject temp = Instantiate(wheelModel, this.transform.position, Quaternion.identity, this.transform);
 
             //Obtain the mesh and vertices of the wheel
             wheel[i].mesh = temp.GetComponentInChildren<MeshFilter>().mesh;
@@ -75,6 +75,9 @@ public class Apply_transforms : MonoBehaviour
         initial_pos = final_pos;
         final_pos = destination;
         elapsed_time = 0;
+        
+        if (final_pos != initial_pos)
+            angle = GetAngle(final_pos - initial_pos);
     }
 
     void DoTransform(){
@@ -85,7 +88,6 @@ public class Apply_transforms : MonoBehaviour
         elapsed_time += Time.deltaTime; //Update the elapsed time
         
 
-        angle = GetAngle(displacement);
         Matrix4x4 move = HW_Transforms.TranslationMat(displacement.x,
                                                       displacement.y,
                                                       displacement.z);

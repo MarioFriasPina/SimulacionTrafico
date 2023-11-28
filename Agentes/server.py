@@ -36,7 +36,7 @@ def getAgents():
     global myModel
 
     if request.method == 'GET':
-        agentPositions = [{"id": str(a[-1].unique_id), "x": x, "y":1, "z":z, "state": "None"} for a, (x, z) in myModel.grid.coord_iter() if isinstance(a[-1], Car)]
+        agentPositions = [{"id": str(a[-1].unique_id), "x": x, "y":1, "z":z, "state": str(a[-1].state)} for a, (x, z) in myModel.grid.coord_iter() if isinstance(a[-1], Car)]
 
         return jsonify({'positions':agentPositions})
 

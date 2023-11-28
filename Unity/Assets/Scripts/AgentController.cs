@@ -126,28 +126,13 @@ public class AgentController : MonoBehaviour
             StartCoroutine(UpdateSimulation());
         }
 
+        
         if (updated)
         {
             timer -= Time.deltaTime;
             dt = 1.0f - (timer / timeToUpdate);
-
-            // Iterates over the agents to update their positions.
-            // The positions are interpolated between the previous and current positions.
-            foreach(var agent in currPositions)
-            {
-                Vector3 currentPosition = agent.Value;
-                Vector3 previousPosition = prevPositions[agent.Key];
-
-                Vector3 interpolated = Vector3.Lerp(previousPosition, currentPosition, dt);
-                Vector3 direction = currentPosition - interpolated;
-
-                agents[agent.Key].transform.localPosition = interpolated;
-                if(direction != Vector3.zero) agents[agent.Key].transform.rotation = Quaternion.LookRotation(direction);
-            }
-
-            // float t = (timer / timeToUpdate);
-            // dt = t * t * ( 3f - 2f*t);
         }
+    
     }
  
     IEnumerator UpdateSimulation()
@@ -212,23 +197,28 @@ public class AgentController : MonoBehaviour
 
             foreach(AgentData agent in agentsData.positions)
             {
-                Vector3 newAgentPosition = new Vector3(agent.x * tileSize, agent.y, agent.z * tileSize);
+                Vector3 newAgentPosition = new Vector3(agent.x * tileSize, agent.y, (agent.z - 1f) * tileSize);
 
                 if (!agents.ContainsKey(agent.id))
                 {
                     prevPositions[agent.id] = newAgentPosition;
-                    agents[agent.id] = Instantiate(agentPrefab, newAgentPosition, Quaternion.identity);
+                    agents[agent.id] = Instantiate(agentPrefab, new Vector3(0, 0, 0), Quaternion.identity);
                     agents[agent.id].name = agent.id;
 
                     Apply_transforms apply_transforms = agents[agent.id].GetComponent<Apply_transforms>(); //Get the script
                     apply_transforms.SetDestination(newAgentPosition); //Set the destination
                     //set time
-                    apply_transforms.move_time = timeToUpdate;
+                    apply_transforms.move_time = Time.deltaTime;
+                }
+                else if (agent.state == "Dead")
+                {
+                    Destroy(agents[agent.id]);
                 }
                 else
                 {
                     Apply_transforms apply_transforms = agents[agent.id].GetComponent<Apply_transforms>(); //Get the script
                     apply_transforms.SetDestination(newAgentPosition); //Set the destination
+                    apply_transforms.move_time = timeToUpdate;
                 }
             }
             updated = true;
