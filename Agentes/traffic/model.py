@@ -75,6 +75,9 @@ class CityModel(Model):
         #Data Collection
         self.staticagents = len(self.schedule.agents)
         self.maxagents = 0
+        
+        self.distances = []
+        self.time_alive = []
 
     def step(self):
         '''Advance the model by one step.'''
@@ -85,7 +88,6 @@ class CityModel(Model):
         if (self.agents > self.maxagents):
             self.maxagents = self.agents
 
-
         if self.steps % 100 == 0:
             print(f"Step: {self.steps}. Number of agents: {self.agents}. Max agents: {self.maxagents}")
 
@@ -94,12 +96,12 @@ class CityModel(Model):
             self.running = False
             print(f"Number of agents: {self.agents}. Max agents: {self.maxagents}")
             print(f"Two cars crashed in step {self.steps} at position {self.crash}")
-            return 1
+            return (self.distances, self.time_alive)
         
         if self.steps > self.max:
             print(f"Number of agents: {self.agents}. Max agents: {self.maxagents}")
             print("Stopped because of max steps")
-            return 1
+            return (self.distances, self.time_alive)
 
         self.schedule.step()
 

@@ -20,6 +20,10 @@ class Car(Agent):
         self.last_pos = None
         self.state = "Alive"
 
+        #Perfromance metrics
+        self.time_alive = 0
+        self.distance_to_dest = len(self.path)
+
     def move(self):
         """ 
         Determines if the agent can move in the direction that was chosen
@@ -42,12 +46,9 @@ class Car(Agent):
         Determines if the agent can move to a new lane to create more space
         """
         direction = self.map[pos]
-        #last_pos = self.map[self.last_pos]
         self.map[pos] = '#'
-        #self.map[self.last_pos] = '#'
         self.path = astar_algo(self.map, (self.model.grid.width, self.model.grid.height), self.pos, self.dest)
         self.map[pos] = direction
-        #self.map[self.last_pos] = last_pos
 
     def step(self):
         """ 
@@ -57,12 +58,16 @@ class Car(Agent):
             self.model.grid.remove_agent(self)
             self.model.schedule.remove(self)
             return
+        
+        self.time_alive += 1
 
         #Kill self if reached destination
         if (self.pos == self.dest):
             self.state = "Dead"
-            #self.model.grid.remove_agent(self)
-            #self.model.schedule.remove(self)
+
+            #Data Collection
+            self.model.distances.append(self.distance_to_dest)
+            self.model.time_alive.append(self.time_alive)
             return
 
         #Dont move if in red light
