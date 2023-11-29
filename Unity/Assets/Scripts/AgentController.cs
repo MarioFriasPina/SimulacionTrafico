@@ -93,7 +93,7 @@ public class AgentController : MonoBehaviour
     public string file;
     public float timeToUpdate = 5.0f;
 
-    [SerializeField] int tileSize;
+    [SerializeField] int tileSize, spawn_delay;
 
     private float timer, dt;
 
@@ -159,6 +159,7 @@ public class AgentController : MonoBehaviour
         WWWForm form = new WWWForm();
 
         form.AddField("file", file);
+        form.AddField("delay", spawn_delay);
 
         UnityWebRequest www = UnityWebRequest.Post(serverUrl + sendConfigEndpoint, form);
         www.SetRequestHeader("Content-Type", "application/x-www-form-urlencoded");

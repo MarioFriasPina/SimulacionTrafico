@@ -21,13 +21,12 @@ def initModel():
 
     if request.method == 'POST':
         file = request.form.get('file')
-        #width = int(request.form.get('width'))
-        #height = int(request.form.get('height'))
+        delay = int(request.form.get('delay'))
         currentStep = 0
 
-        print(request.form)
+        #print(request.form)
         #print(number_agents, width, height)
-        myModel = CityModel(file, 5)
+        myModel = CityModel(file, delay)
 
         return jsonify({"message":"Parameters recieved, model initiated."})
 

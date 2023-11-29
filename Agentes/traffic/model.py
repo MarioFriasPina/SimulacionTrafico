@@ -70,6 +70,7 @@ class CityModel(Model):
         self.max = max
         self.running = True
         self.map.change_lights()
+        self.link_traffic_lights()
 
         #Data Collection
         self.staticagents = len(self.schedule.agents)
@@ -84,15 +85,19 @@ class CityModel(Model):
         if (self.agents > self.maxagents):
             self.maxagents = self.agents
 
-        print(f"Number of agents: {self.agents}. Max agents: {self.maxagents}")
+
+        if self.steps % 100 == 0:
+            print(f"Step: {self.steps}. Number of agents: {self.agents}. Max agents: {self.maxagents}")
 
         self.crash = self.find_crashes()
         if self.crash:
             self.running = False
+            print(f"Number of agents: {self.agents}. Max agents: {self.maxagents}")
             print(f"Two cars crashed in step {self.steps} at position {self.crash}")
             return 1
         
         if self.steps > self.max:
+            print(f"Number of agents: {self.agents}. Max agents: {self.maxagents}")
             print("Stopped because of max steps")
             return 1
 
@@ -101,6 +106,22 @@ class CityModel(Model):
         if self.steps % self.numSteps == 1:
             self.add_cars()
 
+    def link_traffic_lights(self):
+        """
+        Link the traffic lights
+        """
+        for link in self.traffic_lights:
+            #Only calculate once per link
+            if len(link.partners) == 0 and len(link.opposites) == 0:
+                link.master = True
+                for neighbor in self.grid.get_neighbors(link.pos, False, False, 1):
+                    if isinstance(neighbor, Traffic_Light):
+                        link.partners.append(neighbor)
+                        neighbor.partners.append(link)
+                for neighbor in self.grid.get_neighbors(link.pos, True, False, 2):
+                    if isinstance(neighbor, Traffic_Light) and neighbor not in link.partners:
+                        link.opposites.append(neighbor)
+                        neighbor.opposites.append(link)
 
     def find_crashes(self):
         """
@@ -118,5 +139,7 @@ class CityModel(Model):
         """
         for i in [(0, 0), (0, self.height - 1), (self.width - 1, 0), (self.width - 1, self.height - 1)]:
             car = Car(f"car_{self.steps}_{i[0] * self.width + i[1]}", self, i, self.map)
-            self.grid.place_agent(car, i)
-            self.schedule.add(car)
+            #Only place if there are no cars in the corners
+            if len(self.grid.get_neighbors(i, True, True, 0)) < 2:
+                self.grid.place_agent(car, i)
+                self.schedule.add(car)

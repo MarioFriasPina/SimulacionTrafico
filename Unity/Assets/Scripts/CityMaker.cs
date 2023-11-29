@@ -6,7 +6,7 @@ public class CityMaker : MonoBehaviour
 {
     [SerializeField] TextAsset layout;
     [SerializeField] GameObject roadPrefab;
-    [SerializeField] GameObject buildingPrefab;
+    [SerializeField] GameObject buildingPrefab, destinationPrefab;
     [SerializeField] GameObject semaphorePrefab;
     [SerializeField] int tileSize;
 
@@ -83,9 +83,8 @@ public class CityMaker : MonoBehaviour
                 x += 1;
             } else if (tiles[i] == 'D') {
                 position = new Vector3(x * tileSize, 0, y * tileSize);
-                tile = Instantiate(buildingPrefab, position, Quaternion.Euler(0, 90, 0));
+                tile = Instantiate(destinationPrefab, position, Quaternion.Euler(0, 90, 0));
                 tile.transform.localScale = new Vector3(0.45f, 1f, 0.45f);
-                //tile.GetComponent<Renderer>().materials[0].color = Color.red;
                 tile.transform.parent = transform;
                 tile.name = "Destination (" + x + ", " + y + ")";
                 x += 1;

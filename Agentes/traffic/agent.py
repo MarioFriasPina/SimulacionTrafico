@@ -96,15 +96,69 @@ class Traffic_Light(Agent):
         self.state = state
         self.timeToChange = timeToChange
 
+        #Linked traffic lights
+        self.master = False
+        self.partners = []
+        self.opposites = []
+
         #Direction that the light is pointing towards
         self.direction = None
 
+    def count_cars_in_direction(self):
+        """
+        Count the cars in the direction light is facing
+        """
+
+        dir_x = 1
+        dir_y = 1
+
+        vision = 3
+        #Lights can see cars up to 5 squares away
+        if self.direction == "<":
+            mov_x = vision + 1
+            mov_y = 1
+        elif self.direction == ">":
+            mov_x = -(vision + 1)
+            mov_y = 1
+            dir_x = -1
+        elif self.direction == "^":
+            mov_x = 1
+            mov_y = -(vision + 1)
+            dir_y = -1
+        elif self.direction == "v":
+            mov_x = 1
+            mov_y = vision + 1
+
+        cars = 0
+        for pos in [(x, y) for x in range(self.pos[0], self.pos[0] + mov_x, dir_x) for y in range(self.pos[1], self.pos[1] + mov_y, dir_y)]:
+            #if not self.model.grid.out_of_bounds(pos):
+            for here in self.model.grid.iter_neighbors(pos, True, True, 0):
+                if isinstance(here, Car):
+                    cars += 1
+        return cars
+
     def step(self):
         """ 
-        To change the state (green or red) of the traffic light in case you consider the time to change of each traffic light.
+        To change the state (green or red) of the traffic light
         """
-        if self.model.schedule.steps % self.timeToChange == 0:
-            self.state = not self.state
+
+        if not self.master:
+            return
+
+        #If there are more cars in the direction, the light should be red
+        if self.count_cars_in_direction() + self.partners[0].count_cars_in_direction() > self.opposites[0].count_cars_in_direction() + self.opposites[1].count_cars_in_direction():
+            self.state = True
+            self.partners[0].state = True
+            self.opposites[0].state = False
+            self.opposites[1].state = False
+        else:
+            self.state = False
+            self.partners[0].state = False
+            self.opposites[0].state = True
+            self.opposites[1].state = True
+            
+        #if self.model.schedule.steps % self.timeToChange == 0:
+        #    self.state = not self.state
 
 class Destination(Agent):
     """

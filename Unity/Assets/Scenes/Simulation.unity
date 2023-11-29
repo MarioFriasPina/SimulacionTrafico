@@ -153,9 +153,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 883950aa76e0aa44bb80314dab0fd599, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  layout: {fileID: 4900000, guid: c4ee8e330bf578f4cb48bf4510494772, type: 3}
+  layout: {fileID: 4900000, guid: c476b169d707b7b4eaec71a959629820, type: 3}
   roadPrefab: {fileID: 8521628870070417363, guid: cb77fb80d99ffc349bf608946e2fdffb, type: 3}
   buildingPrefab: {fileID: 8420228362700203759, guid: 3a6d6a9a5bf27a54ca7db3c5801bbeb1, type: 3}
+  destinationPrefab: {fileID: 8420228362700203759, guid: ecb14a70777de6247a78e0da16c64bfe, type: 3}
   semaphorePrefab: {fileID: 2716058349196289285, guid: 01c471facf2bee54fb7ebc7f5748a53f, type: 3}
   tileSize: 10
 --- !u!4 &754770272
@@ -187,9 +188,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   agentPrefab: {fileID: 7143483949650245069, guid: 3bce3f0e45944f24aa948ae807efcf34, type: 3}
   obstaclePrefab: {fileID: 2716058349196289285, guid: 01c471facf2bee54fb7ebc7f5748a53f, type: 3}
-  file: traffic/static/city_files/city2021.txt
+  file: traffic/static/city_files/city2023.txt
   timeToUpdate: 0.5
   tileSize: 10
+  spawn_delay: 2
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0
