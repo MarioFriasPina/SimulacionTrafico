@@ -38,7 +38,6 @@ To start the simulation you can select start in Unity with your flask server run
 
 When running the statistics collection version of the program you can change the different test characteristics within the 'stat_collector.py' file. This test will print the average simulation results in different categories specified in the statistics section of this document.
 
-[Statistics
 
 ## Agent Design
 
