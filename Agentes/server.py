@@ -6,6 +6,9 @@ from flask import Flask, request, jsonify
 from traffic.model import CityModel
 from traffic.agent import Car, Traffic_Light
 
+import requests
+import json
+
 # Size of the board:
 number_agents = 10
 width = 28
@@ -54,6 +57,21 @@ def updateModel():
     if request.method == 'GET':
         myModel.step()
         currentStep += 1
+
+        print(f"Number of agents: {myModel.agents}. Max agents: {myModel.maxagents}")
+
+        #Call the validation server
+        if currentStep % 100 == 0:
+            url = "http://52.1.3.19:8585/api/"
+            endpoint = "validate_attempt"
+            data = {"year" : 2023, "classroom" : 301, "name" : "Equipo 8", "num_cars": myModel.maxagents}
+            headers = {"Content-Type": "application/json"}
+
+            response = requests.post(url+endpoint, data=json.dumps(data), headers=headers)
+
+            print("Request " + "successful" if response.status_code == 200 else "failed", "Status code:", response.status_code)
+            print("Response:", response.json())
+
         return jsonify({'message':f'Model updated to step {currentStep}.', 'currentStep':currentStep})
 
 if __name__=='__main__':
