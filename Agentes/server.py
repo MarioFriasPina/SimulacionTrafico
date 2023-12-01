@@ -58,21 +58,23 @@ def updateModel():
         myModel.step()
         currentStep += 1
 
-        print(f"Number of agents: {myModel.agents}. Max agents: {myModel.maxagents}")
+        print(f"Step: {currentStep}. Number of agents: {myModel.agents}. Max agents: {myModel.maxagents}")
 
         #Call the validation server
-        if currentStep % 100 == 0:
+        """
+        if currentStep < 1005 and currentStep % 100 == 0:
             url = "http://52.1.3.19:8585/api/"
-            endpoint = "validate_attempt"
-            data = {"year" : 2023, "classroom" : 301, "name" : "Equipo 8", "num_cars": myModel.maxagents}
+            endpoint = "attempts"
+            data = {"year" : 2023, "classroom" : 301, "name" : "Equipo 8- Mario y Shaul", "num_cars": len(myModel.distances)}
             headers = {"Content-Type": "application/json"}
 
             response = requests.post(url+endpoint, data=json.dumps(data), headers=headers)
 
             print("Request " + "successful" if response.status_code == 200 else "failed", "Status code:", response.status_code)
             print("Response:", response.json())
+        """
 
         return jsonify({'message':f'Model updated to step {currentStep}.', 'currentStep':currentStep})
 
 if __name__=='__main__':
-    app.run(host="localhost", port=8585, debug=True)
+    app.run(host="localhost", port=8585, debug=False)

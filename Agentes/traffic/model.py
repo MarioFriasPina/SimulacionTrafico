@@ -3,6 +3,8 @@ from mesa.time import RandomActivation
 from mesa.space import MultiGrid
 import json
 
+import requests
+
 try:
     from .agent import *
 except:
@@ -18,7 +20,7 @@ class CityModel(Model):
             max: Number of steps before stopping simulation
     """
 
-    def __init__(self, file, N = 4, max = 10000):
+    def __init__(self, file, N = 4, max = 1000):
 
         # Load the map dictionary. The dictionary maps the characters in the map file to the corresponding agent.
         try:
@@ -89,24 +91,30 @@ class CityModel(Model):
             self.maxagents = self.agents
 
         if self.steps % 100 == 0:
-            print(f"Step: {self.steps}. Number of agents: {self.agents}. Max agents: {self.maxagents}")
+            print(f"Step: {self.steps}. Reached Agents: {len(self.distances)}. Number of agents: {self.agents}. Max agents: {self.maxagents}")
 
         self.crash = self.find_crashes()
         if self.crash:
             self.running = False
-            print(f"Number of agents: {self.agents}. Max agents: {self.maxagents}")
+            print(f"Step: {self.steps}. Reached Agents: {len(self.distances)}. Number of agents: {self.agents}. Max agents: {self.maxagents}")
             print(f"Two cars crashed in step {self.steps} at position {self.crash}")
             return (self.distances, self.time_alive)
         
         if self.steps > self.max:
-            print(f"Number of agents: {self.agents}. Max agents: {self.maxagents}")
+            self.running = False
+            print(f"Step: {self.steps}. Reached Agents: {len(self.distances)}. Number of agents: {self.agents}. Max agents: {self.maxagents}")
             print("Stopped because of max steps")
             return (self.distances, self.time_alive)
 
         self.schedule.step()
 
-        if self.steps % self.numSteps == 1:
+        if self.steps % self.numSteps == 0:
             self.add_cars()
+            #if self.add_cars() == 0:
+                #self.running = False
+                #print(f"Step: {self.steps}. Reached Agents: {len(self.distances)}. Number of agents: {self.agents}. Max agents: {self.maxagents}")
+                #print("Stopped because no new cars were added")
+                #return (self.distances, self.time_alive)
 
     def link_traffic_lights(self):
         """
@@ -139,9 +147,12 @@ class CityModel(Model):
         """
         Add cars in corners
         """
+        new_cars = 0
         for i in [(0, 0), (0, self.height - 1), (self.width - 1, 0), (self.width - 1, self.height - 1)]:
             car = Car(f"car_{self.steps}_{i[0] * self.width + i[1]}", self, i, self.map)
             #Only place if there are no cars in the corners
             if len(self.grid.get_neighbors(i, True, True, 0)) < 2:
                 self.grid.place_agent(car, i)
                 self.schedule.add(car)
+                new_cars += 1
+        return new_cars

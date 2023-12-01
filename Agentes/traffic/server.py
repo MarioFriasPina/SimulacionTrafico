@@ -69,7 +69,7 @@ with open(file) as baseFile:
     width = len(lines[0])-1
     height = len(lines)
 
-model_params = {"file" : file, "N":2}
+model_params = {"file" : file, "N":1}
 
 #print(width, height)
 grid = CanvasGrid(agent_portrayal, width, height, 500, 500)

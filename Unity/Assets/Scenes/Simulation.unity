@@ -189,9 +189,9 @@ MonoBehaviour:
   agentPrefab: {fileID: 7143483949650245069, guid: 3bce3f0e45944f24aa948ae807efcf34, type: 3}
   obstaclePrefab: {fileID: 2716058349196289285, guid: 01c471facf2bee54fb7ebc7f5748a53f, type: 3}
   file: traffic/static/city_files/city2023.txt
-  timeToUpdate: 0.5
+  timeToUpdate: 0.1
   tileSize: 10
-  spawn_delay: 2
+  spawn_delay: 3
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0
